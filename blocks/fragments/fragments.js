@@ -8,7 +8,7 @@ import { getMetadata } from '../../scripts/aem.js';
 
 const serviceBaseURL = 'https://txw6tavv82.execute-api.us-east-1.amazonaws.com/helix-services/fragment-ingestor/1.5.1';
 const baseAEM = 'https://publish-p91957-e809713.adobeaemcloud.com';
-const DEFAULT_LIMIT = 10;
+const DEFAULT_LIMIT = 3;
 
 function isFloat(value) {
   return typeof value === 'number' && Number.isFinite(value) && value % 1 !== 0;
