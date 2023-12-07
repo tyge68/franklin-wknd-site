@@ -108,7 +108,8 @@ function parseOptions(options) {
 
 export default async function decorate(block) {
   const fragmentsMeta = getMetadata('fragments');
-  let query;
+  const options = block.children[0].children[0].innerText;
+  const query = JSON.parse(options);
   const cardsContainer = document.createElement('div');
   cardsContainer.classList.add('cards');
 
@@ -132,24 +133,7 @@ export default async function decorate(block) {
   const nav = document.createElement('div');
   nav.classList.add('nav');
   nav.append(previous, next);
-  const queryfield = document.createElement('textarea');
-  const queryapply = document.createElement('button');
-  queryapply.innerText = "Apply";
-  queryapply.onclick = () => {
-   currentOffset = 0;
-   try {
-    query = JSON.parse(queryfield.value);
-    loadFragments(query, currentOffset).then((fragments) => updateContent(fragments));
-   } catch(err) {
-    console.error(err);
-   }
-  }
-  const querybox = document.createElement('div');
-  querybox.classList.add('querybox');
-  querybox.append(queryfield);
-  querybox.append(queryapply);
 
-  const options = parseOptions(block.children[0].children[0].innerHTML);
   const template = block.children[1].innerHTML;
   function updateContent(results) {
     const cards = [];
@@ -187,5 +171,4 @@ export default async function decorate(block) {
   block.innerText = '';
   block.append(nav);
   block.append(cardsContainer);
-  block.append(querybox);
 }
