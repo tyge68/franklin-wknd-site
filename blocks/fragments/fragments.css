@@ -1,0 +1,38 @@
+/* suppress nested section padding */
+.fragments {
+}
+
+.nav {
+    display: flex;
+    justify-content: right;
+}
+
+.card p {
+    width: 200px;
+    margin-top: unset;
+    margin-bottom: unset;
+    text-wrap: nowrap;
+    overflow: hidden;
+}
+
+.cards {
+    display: flex;
+    flex-flow: row wrap;
+    align-items: flex-start;
+}
+
+.card {
+    margin: 10px;
+    padding: 10px;
+    border: 1px solid #ccc;
+}
+
+.fragments img {
+    width: 200px;
+    max-width: unset;
+}
+
+.break {
+    /* flex-basis: 100%;
+    height: 0; */
+}
