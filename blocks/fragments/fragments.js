@@ -170,10 +170,19 @@ export default async function decorate(block) {
       const andOperations = splitAnd
         .filter(v => v.trim().length > 2)
         .map(value => {
-          return {
-            type: "contains",
-            name: "*",
-            value,
+          const composite = value.split(":");
+          if (composite.length === 2) {
+            return {
+              type: "contains",
+              name: composite[0],
+              value: composite[1],
+            }              
+          } else {
+            return {
+              type: "contains",
+              name: "*",
+              value: composite[0],
+            }              
           }
         });
       if (andOperations.length > 0) {
