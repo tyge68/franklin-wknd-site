@@ -89,20 +89,32 @@ function replaceAny(template, mapping) {
 export async function loadFragments(query, offset) {
   const queryURI = query ? `&query=${encodeURI(JSON.stringify(query))}` : "";
   const { modelId } = query || null;
-  const opts = {
-    headers: {
-      'Cache-Control': 'no-cache',
-      'Franklin-Tenant': window.localStorage.getItem('franklin-tenant'),
-      'Franklin-Mode': window.localStorage.getItem('franklin-preview'),
-      'x-edge-authorization': window.localStorage.getItem('franklin-auth'),
-    },
-  };
-  const params = offset ? `&offset=${offset}` : '';
   if (modelId) {
+    const opts = {
+      headers: {
+        'Cache-Control': 'no-cache',
+        'Franklin-Tenant': window.localStorage.getItem('franklin-tenant'),
+        'Franklin-Mode': window.localStorage.getItem('franklin-preview'),
+        'x-edge-authorization': window.localStorage.getItem('franklin-auth'),
+      },
+    };
+    const params = offset ? `&offset=${offset}` : '';
+    const cacheKey = `${modelId}${DEFAULT_LIMIT}${params}${queryURI}`;
+    const cachedData = localStorage.getItem(cacheKey);
+    let cachedInfo;
+    if (cachedData) {
+      cachedInfo = JSON.parse(cachedData);
+      opts.headers['If-Modified-Since'] = cachedInfo.lastModified;
+    }
     const resp = await fetch(`${serviceBaseURL}/shon/27485d254823d8cfe0d971c28490886a766642678d4ccd1ca93d502501d74582/${modelId}.json?limit=${DEFAULT_LIMIT}${params}${queryURI}`, opts);
     if (resp.ok) {
-      return resp.json();
-    }  
+      const lastModified = resp.headers.get('last-modified');
+      const result = await resp.json();
+      localStorage.setItem(cacheKey, JSON.stringify({ lastModified, result }));
+      return result;
+    } else if (resp.status === 304) {
+      return cachedInfo.result;
+    }
   }
   return null;
 }
