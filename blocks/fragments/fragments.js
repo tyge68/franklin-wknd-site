@@ -157,6 +157,37 @@ export default async function decorate(block) {
   nav.classList.add('nav');
   nav.append(previous, next);
 
+  const searchbox = document.createElement('div');
+  searchbox.classList.add('search');
+  const inputsearch = document.createElement('input');
+  inputsearch.type = 'text';
+  const applybutton = document.createElement('button');
+  applybutton.innerText = 'Search';
+  applybutton.onclick = () => {
+    const { value } = inputsearch;
+    if (value && value.length > 2) {
+      const splitAnd = value.split(' ');
+      const andOperations = splitAnd
+        .filter(v => v.trim().length > 2)
+        .map(value => {
+          return {
+            type: "contains",
+            name: "*",
+            value,
+          }
+        });
+      if (andOperations.length > 0) {
+        query.filter = {
+          type: "and",
+          conditions: andOperations,
+        }
+        currentOffset = 0;
+        loadFragments(query, currentOffset).then((result) => updateContent(result));
+      }
+    }
+  }
+  searchbox.append(inputsearch, applybutton);
+
   const template = block.children[1].innerHTML;
   function updateContent(results) {
     const cards = [];
@@ -192,6 +223,5 @@ export default async function decorate(block) {
     console.error(err);
   }
   block.innerText = '';
-  block.append(nav);
-  block.append(cardsContainer);
+  block.append(searchbox, nav, cardsContainer);
 }
