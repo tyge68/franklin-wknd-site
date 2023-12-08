@@ -52,23 +52,30 @@ function hasMore(fragments) {
 
 function replaceAny(template, mapping) {
   // Use a regular expression to find all occurrences of <property> in the template
-  const regex = /(&lt;[a-zA-Z0-9_]*&gt;)/g;
+  const regex = /(&lt;[a-zA-Z0-9_:]*&gt;)/g;
 
   // Use the `replace` method with a callback function to replace the placeholders
   const replacedTemplate = template.replace(regex, (match, property) => {
     // Check if the property exists in the object, and use it as a replacement if found
     const placeholder = property.substring(4, property.length - 4);
-    if (mapping.hasOwnProperty(placeholder)) {
-      const value = mapping[placeholder];
+    const composite = placeholder.split(':');
+    const propertyName = composite.length === 2 ? composite[1]:composite[0];
+    const format = composite.length === 2 ? composite[0]:'default';
+    if (mapping.hasOwnProperty(propertyName)) {
+      const value = mapping[propertyName];
       if (isFloat(value)) {
         return value.toFixed(2);
       } if (isString(value)) {
-        return value.replace(/\n/g, '<br>');
+        if (format === 'img') {
+          return `<img src='${value}'>`;
+        } else {
+          return value.replace(/\n/g, '<br>');
+        }
       }
       return value;
     }
     // If the property doesn't exist in the object, leave the placeholder as is
-    return match;
+    return '';
   });
 
   return replacedTemplate;
@@ -81,6 +88,7 @@ function replaceAny(template, mapping) {
  */
 export async function loadFragments(query, offset) {
   const queryURI = query ? `&query=${encodeURI(JSON.stringify(query))}` : "";
+  const { modelId } = query || null;
   const opts = {
     headers: {
       'Franklin-Tenant': window.localStorage.getItem('franklin-tenant'),
@@ -89,9 +97,11 @@ export async function loadFragments(query, offset) {
     },
   };
   const params = offset ? `&offset=${offset}` : '';
-  const resp = await fetch(`${serviceBaseURL}/shon/27485d254823d8cfe0d971c28490886a766642678d4ccd1ca93d502501d74582/l2nvbmyvd2tuzc1zagfyzwqvc2v0dgluz3mvzgftl2nmbs9tb2rlbhmvywr2zw50dxjl.json?limit=${DEFAULT_LIMIT}${params}${queryURI}`, opts);
-  if (resp.ok) {
-    return resp.json();
+  if (modelId) {
+    const resp = await fetch(`${serviceBaseURL}/shon/27485d254823d8cfe0d971c28490886a766642678d4ccd1ca93d502501d74582/${modelId}.json?limit=${DEFAULT_LIMIT}${params}${queryURI}`, opts);
+    if (resp.ok) {
+      return resp.json();
+    }  
   }
   return null;
 }
