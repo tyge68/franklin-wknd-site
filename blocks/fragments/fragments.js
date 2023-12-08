@@ -8,7 +8,7 @@ import { getMetadata } from '../../scripts/aem.js';
 
 const serviceBaseURL = 'https://txw6tavv82.execute-api.us-east-1.amazonaws.com/helix-services/fragment-ingestor/1.5.1';
 const baseAEM = 'https://publish-p91957-e809713.adobeaemcloud.com';
-const DEFAULT_LIMIT = 3;
+const DEFAULT_LIMIT = 25;
 
 function isFloat(value) {
   return typeof value === 'number' && Number.isFinite(value) && value % 1 !== 0;
@@ -91,6 +91,7 @@ export async function loadFragments(query, offset) {
   const { modelId } = query || null;
   const opts = {
     headers: {
+      'Cache-Control': 'no-cache',
       'Franklin-Tenant': window.localStorage.getItem('franklin-tenant'),
       'Franklin-Mode': window.localStorage.getItem('franklin-preview'),
       'x-edge-authorization': window.localStorage.getItem('franklin-auth'),
