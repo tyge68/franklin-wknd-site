@@ -52,7 +52,7 @@ function hasMore(fragments) {
 
 function replaceAny(template, mapping) {
   // Use a regular expression to find all occurrences of <property> in the template
-  const regex = /(&lt;[a-zA-Z0-9_:]*&gt;)/g;
+  const regex = /(&lt;[$a-zA-Z0-9_:]*&gt;)/g;
 
   // Use the `replace` method with a callback function to replace the placeholders
   const replacedTemplate = template.replace(regex, (match, property) => {
